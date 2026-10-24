@@ -46,3 +46,85 @@ Emplea principios físicos y criptográficos avanzados. Destaca la Distribución
 | **Criptografía Asimétrica** | Usa un par de claves: pública (cifra) y privada (descifra) (ej. RSA, ECC). | Firmas digitales, intercambio seguro de claves y autenticación. |
 | **Funciones Hash** | Algoritmos unidireccionales que generan una huella digital única de un archivo. | Integridad de datos, contraseñas y bloques de Blockchain. |
 | **Seguridad Cuántica (QKD)** | Seguridad basada en las leyes de la física cuántica para detectar escuchas. | Canales de comunicación gubernamentales y financieros de ultra-alta seguridad. |
+
+# Parte 2: Pregunta Integradora - El viaje de Commit a GitHub y Análisis de Redes
+1. El Modelo OSI y su aplicación
+El Modelo OSI es un marco de referencia de 7 capas para la interconexión de sistemas abiertos:
+
+Capa 1 - Física: Transmisión de bits crudos a través del medio físico (cables, ondas).
+
+Capa 2 - Enlace de Datos: Control de acceso al medio y direccionamiento físico (MAC), tramas (Ethernet, Wi-Fi).
+
+Capa 3 - Red: Enrutamiento de paquetes IP y direccionamiento lógico entre redes distintas.
+
+Capa 4 - Transporte: Confiabilidad, control de flujo y errores mediante segmentos (TCP, UDP).
+
+Capa 5 - Sesión: Apertura, gestión y cierre de sesiones entre aplicaciones.
+
+Capa 6 - Presentación: Traducción, compresión y cifrado/descifrado de datos (SSL/TLS).
+
+Capa 7 - Aplicación: Interfaz directa con el usuario y servicios de red (HTTP/HTTPS, SSH).
+Congestión de Routers: Si un router descarta paquetes por congestión, TCP retransmitirá los segmentos perdidos, reduciendo la ventana de congestión y disminuyendo el throughput (ancho de banda útil). Para identificar el salto con pérdidas se usa el comando tracert (Windows) o pathping.
+
+Campo IP clave: El campo TTL (Time to Live) evita que un paquete circule indefinidamente restando 1 en cada router que atraviesa hasta llegar a cero.
+Paso 4: Confirmación y fin de la comunicación
+Confirmación: GitHub utiliza segmentos TCP con banderas ACK (Acknowledgment) y números de secuencia para confirmar la recepción íntegra y ordenada de los datos (garantizando fiabilidad).
+
+Cierre ordenado: Se realiza mediante el intercambio de paquetes con las banderas FIN y ACK (cierre de 4 vías en TCP).
+
+Monitoreo SNMP: Si fueras administrador, usarías SNMPv3 (versión segura que incluye cifrado y autenticación) para monitorear contadores de interfaz como ifInOctets, ifOutOctets y paquetes descartados (ifInDiscards / ifOutDiscards).
+# Ejercicio en Clase: Sistema de Gestión y Análisis en Redes Convergentes (Voz, Video y Datos)
+import time
+
+class RedConvergenteManager:
+    def __init__(self):
+        self.dispositivos = []
+
+    def generar_plantilla_cisco(self, hostname, vlan_voice_id):
+        config = f"""
+        ! Plantilla de Configuración Cisco para {hostname}
+        en
+        configure terminal
+        hostname {hostname}
+        !
+        vlan {vlan_voice_id}
+         name VOID_DATA
+        !
+        interface GigabitEthernet0/1
+         switchport mode access
+         switchport voice vlan {vlan_voice_id}
+         mls qos trust cos
+        end
+        """
+        return config
+
+    def generar_plantilla_huawei(self, hostname, vlan_voice_id):
+        config = f"""
+        # Plantilla de Configuración Huawei para {hostname}
+        system-view
+        sysname {hostname}
+        vlan batch {vlan_voice_id}
+        interface GigabitEthernet0/0/1
+         port link-type access
+         port default vlan {vlan_voice_id}
+        #
+        qos profile VOIP_QoS
+        """
+        return config
+
+    def analizar_metricas_qos(self, latencia, jitter, perdida_paquetes):
+        print(f"--- Análisis de Calidad de Servicio (QoS) en Tiempo Real ---")
+        print(f"Latencia analizada: {latencia} ms")
+        print(f"Jitter analizado: {jitter} ms")
+        print(f"Pérdida de paquetes: {perdida_paquetes}%")
+        
+        if latencia < 150 and jitter < 30 and perdida_paquetes < 1:
+            return "ESTADO: Óptimo para Tráfico de Voz y Video (VoIP / Streaming)"
+        else:
+            return "ESTADO: Alerta - Tráfico sensible afectado. Se requiere aplicar QoS prioritario."
+
+# Ejemplo de uso del sistema
+if __name__ == "__main__":
+    manager = RedConvergenteManager()
+    print(manager.generar_plantilla_cisco("Switch-Core-Bogota", 20))
+    print(manager.analizar_metricas_qos(latencia=45, jitter=12, perdida_paquetes=0.2))
